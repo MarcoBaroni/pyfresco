@@ -17,6 +17,7 @@ extensions = [
     'sphinx.ext.intersphinx',   # Link to other Sphinx documentations
     'sphinx.ext.viewcode',      # Add links to highlighted source code
     'sphinx.ext.mathjax',  # Enables LaTeX-style math rendering
+    'sphinx.ext.autosummary'
     ]
 
 templates_path = ['_templates']
