@@ -1227,10 +1227,27 @@ class SpectraAnalysis():
         -------
         None
         """
-        self.a = a
-        self.m = m
-        self.fwhm = fwhm
-        self.alpha = alpha
+
+        #lims = self.limits()
+        wav = self.w#[lims[0]:lims[1]]
+        
+        ones = np.ones(len(wav))
+        GAUSS = np.zeros((len(self.a) , len(wav)))
+        for i in range(len(self.a)):
+            
+            W = np.exp( -4*np.log(2)*( (wav - self.m[i]*ones)/self.fwhm[i] )**2 )
+            skew = erf( 2*np.sqrt(np.log(2))*self.alpha[i]*( wav - self.m[i]*ones )/self.fwhm[i]  )
+            
+            GAUSS[i] = self.a[i]*W*(ones+skew)
+    
+        fig , ax = plt.subplots()
+        ax.plot(wav , self.final , 'r' , linewidth = 1.5)
+        for i in range(len(self.a)):            
+            ax.plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1)
+        ax.set_xlabel('$\lambda$ [nm]')
+        plt.show()
+        
+        return GAUSS
 
     def both_fit(self):
             """
@@ -1244,10 +1261,10 @@ class SpectraAnalysis():
             -------
             None
             """
-            self.a = a
-            self.m = m
-            self.fwhm = fwhm
-            self.alpha = alpha
+            a = self.a
+            m = self.m
+            fwhm = self.fwhm
+            alpha = self.alpha
             
             #lims = self.limits()
             wav = self.w#[lims[0]:lims[1]]
