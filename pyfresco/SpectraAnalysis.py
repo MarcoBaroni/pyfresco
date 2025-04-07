@@ -834,7 +834,7 @@ class SpectraAnalysis():
 
         return self.final        
     
-    def mgm(self , n, iterations, lr, means=None, asym=False ,
+    def mgm(self , n, iterations, lr, means=None, mean_ranges = [] , asym=False ,
             smooth = False , hull = False ,
             interp = 'linear' , t = 'savgol' , w = 0 , o = 0):
         r"""
@@ -858,6 +858,8 @@ class SpectraAnalysis():
             Learning rate for the Adam orptimizer.
         means : list of float or None
             If None, then the means (μ) are inserted in the fitting parameters. If a list is given, then the values in the list will be used as mean values for the distributions. Default is None.
+        mean_ranges : list of tuples of float or None
+            If None, no ranges is given to the distributions for the fit. If the list of tuples is given, then the search of the mean will be constrained inside an interval (min,max).
         asym : bool
             If True, then the distributions fitted are Skew Normal Distributions, if False, then the alpha parameters will be set to zero, thus efficiently modeling the absorptions as simple Gaussian distributions. Default is False.
         smooth : bool
@@ -932,9 +934,24 @@ class SpectraAnalysis():
 
         fwhm = torch.randn(n, device=device, requires_grad=True)
 
+        #if means is None:
+        #    m = torch.randn(n, device=device, requires_grad=True)
+        #    params = [a, m, fwhm]
+        #else:
+        #    params = [a, fwhm]
+        #    for i in range(len(means)):
+        #        means[i] = (means[i] - B) / (A-B)
+        #    m = torch.tensor(np.array(means), dtype=torch.float32, device=device)
+
         if means is None:
-            m = torch.randn(n, device=device, requires_grad=True)
-            params = [a, m, fwhm]
+            if mean_ranges is not None:
+                # Normalize and create tensor bounds
+                mean_bounds = [( (min_val - B) / (A - B), (max_val - B) / (A - B) ) for (min_val, max_val) in mean_ranges]
+                m_raw = torch.rand(n, device=device, requires_grad=True)  # between 0 and 1
+                params = [a, m_raw, fwhm]
+            else:
+                m_raw = torch.randn(n, device=device, requires_grad=True)
+                params = [a, m_raw, fwhm]
         else:
             params = [a, fwhm]
             for i in range(len(means)):
@@ -952,11 +969,29 @@ class SpectraAnalysis():
         losses = []
         gaussian_sums = []
 
+        #print('Initial Conditions are: \n',
+        #      'A = ', torch.sigmoid(a).cpu().detach().numpy(), '\n',
+        #      'FWHM = ', (torch.sigmoid(fwhm) * (A-B)).cpu().detach().numpy(), '\n',
+        #      'Alpha = ', alpha.cpu().detach().numpy(), '\n',
+        #      'X = ', (m * (A-B) + B).cpu().detach().numpy(), '\n')
+
+        # Compute m2 once to show in print
+        if means is None:
+            if mean_ranges is not None:
+                m2 = torch.zeros_like(m_raw)
+                for idx in range(n):
+                    min_bound, max_bound = mean_bounds[idx]
+                    m2[idx] = min_bound + (max_bound - min_bound) * torch.sigmoid(m_raw[idx])
+            else:
+                m2 = torch.sigmoid(m_raw)
+        else:
+            m2 = m
+        
         print('Initial Conditions are: \n',
               'A = ', torch.sigmoid(a).cpu().detach().numpy(), '\n',
               'FWHM = ', (torch.sigmoid(fwhm) * (A-B)).cpu().detach().numpy(), '\n',
               'Alpha = ', alpha.cpu().detach().numpy(), '\n',
-              'X = ', (m * (A-B) + B).cpu().detach().numpy(), '\n')
+              'M = ', (m2 * (A-B) + B).cpu().detach().numpy(), '\n')
 
         K , k = 2 * np.sqrt(2 * np.log(2)) , 2*np.sqrt(np.log(2))
 
@@ -965,8 +1000,19 @@ class SpectraAnalysis():
 
             a2 = torch.sigmoid(a)
             fwhm2 = torch.sigmoid(fwhm)
+            #if means is None:
+            #    m2 = torch.sigmoid(m)
+            #else:
+            #    m2 = m
+
             if means is None:
-                m2 = torch.sigmoid(m)
+                if mean_ranges is not None:
+                    m2 = torch.zeros_like(m_raw)
+                    for idx in range(n):
+                        min_bound, max_bound = mean_bounds[idx]
+                        m2[idx] = min_bound + (max_bound - min_bound) * torch.sigmoid(m_raw[idx])
+                else:
+                    m2 = torch.sigmoid(m_raw)
             else:
                 m2 = m
 
@@ -989,11 +1035,27 @@ class SpectraAnalysis():
         gaussian_sum = gaussian_sum.cpu().detach().numpy()
         a = torch.sigmoid(a).cpu().detach().numpy()
         fwhm = (torch.sigmoid(fwhm)*(A-B)).cpu().detach().numpy()
+        #if means is None:
+        #    m = (torch.sigmoid(m)*(A-B) + B).cpu().detach().numpy()
+        #else:
+        #    m = (m*(A-B)+B).cpu().detach().numpy()
+        alpha = alpha.cpu().detach().numpy()
+
+
         if means is None:
-            m = (torch.sigmoid(m)*(A-B) + B).cpu().detach().numpy()
+            if mean_ranges is not None:
+                m = []
+                for idx in range(n):
+                    min_bound, max_bound = mean_ranges[idx]
+                    min_bound , max_bound = (min_bound-B)/(A-B) , (max_bound-B)/(A-B)
+                    #min_bound , max_bound = 1/(1+np.exp(-min_bound)) , 1/(1+np.exp(-max_bound))#torch.sigmoid(min_bound) , torch.sigmoid(max_bound)
+                    m_val = min_bound + (max_bound - min_bound) * torch.sigmoid(m_raw[idx])
+                    m.append(m_val * (A - B) + B)
+                m = np.array([v.cpu().detach().numpy() for v in m])
+            else:
+                m = (torch.sigmoid(m_raw)*(A-B) + B).cpu().detach().numpy()
         else:
             m = (m*(A-B)+B).cpu().detach().numpy()
-        alpha = alpha.cpu().detach().numpy()
         
         self.losses = losses
         self.gaussian_sums = gaussian_sums
@@ -1145,24 +1207,84 @@ class SpectraAnalysis():
         self.m = m
         self.fwhm = fwhm
         self.alpha = alpha
-        
-        #lims = self.limits()
-        wav = self.w#[lims[0]:lims[1]]
-        
-        ones = np.ones(len(wav))
-        GAUSS = np.zeros((len(self.a) , len(wav)))
-        for i in range(len(self.a)):
+
+    def both_fit(self):
+            """
+            Function to plot the fit of each single distribution, the global fit and the MSE per wavelength of the machine learning MGM.
             
-            W = np.exp( -4*np.log(2)*( (wav - self.m[i]*ones)/self.fwhm[i] )**2 )
-            skew = erf( 2*np.sqrt(np.log(2))*self.alpha[i]*( wav - self.m[i]*ones )/self.fwhm[i]  )
+            Parameters
+            ----------
+            None
             
-            GAUSS[i] = self.a[i]*W*(ones+skew)
+            Returns
+            -------
+            None
+            """
+            self.a = a
+            self.m = m
+            self.fwhm = fwhm
+            self.alpha = alpha
+            
+            #lims = self.limits()
+            wav = self.w#[lims[0]:lims[1]]
+            
+            ones = np.ones(len(wav))
+            GAUSS = np.zeros((len(self.a) , len(wav)))
+            for i in range(len(self.a)):
+                
+                W = np.exp( -4*np.log(2)*( (wav - self.m[i]*ones)/self.fwhm[i] )**2 )
+                skew = erf( 2*np.sqrt(np.log(2))*self.alpha[i]*( wav - self.m[i]*ones )/self.fwhm[i]  )
+                
+                GAUSS[i] = self.a[i]*W*(ones+skew)
     
-        fig , ax = plt.subplots()
-        ax.plot(wav , self.final , 'r' , linewidth = 1.5)
-        for i in range(len(self.a)):            
-            ax.plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1)
-        ax.set_xlabel('$\lambda$ [nm]')
-        plt.show()
+            def scientific_format(y, pos):
+                return r'${0:.1f} \times 10^{{-6}}$'.format(y * 1e6)
+            
+            #lims = self.limits()
+            wav = self.w#[lims[0]:lims[1]]
+            
+            fig , ax = plt.subplots(2,1 , sharex = True , squeeze = True ,gridspec_kw={'width_ratios':[1], 'height_ratios':[1,4]})
+            mr , Mr = min(self.residuals) , max(self.residuals)
+            #ax[0].set_yscale('log')
+            for i in range(len(self.a)):            
+                if i == len(self.a)-1:
+                    ax[1].plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1 , label = 'Single Distribution')
+                else:
+                    ax[1].plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1)
+            ax[1].plot(wav , self.final , 'k' , label = 'Target')
+            ax[1].plot(wav , self.gaussian_sum , 'b' , label = 'Approximation')
+            ax[0].plot(wav , self.residuals , 'r' , label = 'Residuals')
+            
+            ax[0].yaxis.set_major_formatter(FuncFormatter(scientific_format))
+    
+            ax[1].set_xlabel('$\lambda$ [nm]')
+    
+            fig.subplots_adjust(hspace=0)
+    
+            ax[1].legend()
+            ax[0].set_ylabel('MSE')
+            ax[1].set_ylabel('Relative Reflectance')
+            plt.show()
+            
+            return GAUSS
+            
+            #lims = self.limits()
+            wav = self.w#[lims[0]:lims[1]]
+            
+            ones = np.ones(len(wav))
+            GAUSS = np.zeros((len(self.a) , len(wav)))
+            for i in range(len(self.a)):
+                
+                W = np.exp( -4*np.log(2)*( (wav - self.m[i]*ones)/self.fwhm[i] )**2 )
+                skew = erf( 2*np.sqrt(np.log(2))*self.alpha[i]*( wav - self.m[i]*ones )/self.fwhm[i]  )
+                
+                GAUSS[i] = self.a[i]*W*(ones+skew)
         
-        return GAUSS
+            fig , ax = plt.subplots()
+            ax.plot(wav , self.final , 'r' , linewidth = 1.5)
+            for i in range(len(self.a)):            
+                ax.plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1)
+            ax.set_xlabel('$\lambda$ [nm]')
+            plt.show()
+            
+            return GAUSS
