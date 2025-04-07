@@ -227,6 +227,26 @@ class RGBImageManipulator():
 
         return [area_inferior , area_superior]
 
+    def Labels(self):
+        L = {'TRU': [['--' , 'white' , 'white'] , ['--' , 'white' , 'white']],#'Enhanced true color.' , 
+          'VNA': [['--' , 'white' , 'white'] , ['--' , 'white' , 'white']],#'Photometric correct I/F, used to correlate morphology and spectral variation.' , 
+          'FEM': [['--' , 'white' , 'white'] , ['--' , 'white' , 'white']],#'Fe minerals absorption.' , 
+          'FM2': [['--' , 'white' , 'white'] , ['--' , 'white' , 'white']],#'Complementary info on Fe minerals.' , 
+          'FAL': [['Olivine' , 'red' , 'orange'] , ['Clay' , 'mediumseagreen' , 'blue'] , ['Carbonates' , 'green' , 'green'] , ['Basalts' , 'gray' , 'brown']] ,
+          'MAF': [['Olivine' , 'red' , 'red'] , ['Low Ca Pyroxene' , 'green' , 'cyan'] , ['High Ca Pyroxene' , 'blue' , 'magenta']],
+          'HYD': [['Polyhydrated sulfates' , 'magenta' , 'magenta'] , ['Monohydrated sulfates' , 'yellow' , 'green'] , ['Hydrated minerals' , 'blue' , 'blue']],
+          'PHY': [['Non hydrated Fe/Mg-OH' , 'red' , 'red'] , ['Hydrated Fe/Mg-OH' , 'magenta' , 'magenta'] , ['Non hydrated Al/Si-OH' , 'green' , 'green'] , ['Hydrated Al/Si-OH' , 'cyan' , 'cyan'] , ['Hydrated minerals' , 'blue' , 'blue']], 
+          'PFM': [['Prehnite' , 'red' , 'yellow'] , ['Chlorite' ,  'red' , 'yellow'] , ['Epidote' , 'red' , 'yellow'] , ['Ca/Fe carbonate', 'red' , 'yellow'] , ['Fe/Mg smectites / Mg carbonates' , 'cyan' , 'cyan'] , ['Kaolinite' , 'white' , 'white']] ,
+          'PAL': [['Al smectites/Hydrated silica' , 'red' , 'yellow'] , ['Alunite' , 'cyan' , 'cyan'] , ['Kaolinite' , 'white' , 'white']] ,
+          'HYS': [['Hydrated silica' , 'red' , 'yellow'] , ['Jarosite' , 'yellow' , 'yellow'] , ['Al-OH minerals' , 'cyan' , 'cyan'] , ['Other hydrates' , 'blue' , 'blue']] ,
+          'ICE': [['Other hydrates' , 'red' , 'red'] , ['H2O ice' , 'green' , 'green'] , ['CO2 ice' , 'blue' , 'blue'] ] ,
+          'IC2': [['Ice free surface' , 'red' ,'red'] , ['H2O ice' , 'green' , 'green'] , ['CO2 ice' , 'blue' , 'blue'] ] , 
+          'CHL': [['Hydr. mineral and phyllosilicates' , 'yellow' , 'green'] , ['Chloride' , 'blue' , 'blue']],
+          'CAR': [['Fe/Mg phyllosilicates' , 'red' , 'magenta'] , ['Mg carbonates' , 'yellow' , 'lightblue'] , ['Other hydrates' , 'blue' , 'blue'] ] ,
+          'CR2': [['Mg carbonates' , 'red' , 'magenta'] , ['Fe/Ca carbonates' , 'green' , 'cyan']]
+         }
+        return L
+
     def RGBmapmake(self, FALSE , bi ,clip , cumhist ,preset_true_colors , use_false_color ,
                        R_min_in = [0,1]  , R_max_in = [0,1]  ,
                        G_min_in = [0,1]  , G_max_in = [0,1]  ,
@@ -499,7 +519,7 @@ class RGBImageManipulator():
                 patches = []
                 labe = []
 
-                L = Labels[self.preset]
+                L = self.Labels()[self.preset]
 
                 for i in range(len(L)):
 
