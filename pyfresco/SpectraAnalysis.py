@@ -1,3 +1,27 @@
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+from matplotlib.path import Path
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.widgets import PolygonSelector
+import matplotlib.animation as animation
+from matplotlib.backend_bases import MouseButton
+from matplotlib.ticker import FuncFormatter
+
+import numpy as np
+import pandas as pd
+
+from scipy.stats import median_abs_deviation as MAD
+from scipy.spatial import ConvexHull
+from scipy.interpolate import interp1d
+from scipy.special import erf
+from scipy.signal import savgol_filter, argrelextrema, find_peaks
+
+from kneed import KneeLocator
+
+import torch
+import torch.nn.functional as F
+from torch import nn
 class SpectraAnalysis():
     """
     Class to perform the required spectral analyses. 
