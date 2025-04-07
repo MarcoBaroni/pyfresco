@@ -447,3 +447,50 @@ class SpectraExtract():
             else:
                 np.savetxt(folder + name + '_' + method +'_median.txt' , self.m_spec)
                 np.savetxt(folder + name + '_' + method +'_mad.txt' , self.err_spec)
+
+        def upload_spectrum(self , name , folder = None , mean = True):
+            """
+            Function to upload a set of pre-extracted spectra, saved using SpectraExtarct.save_spectra().
+            
+            Parameters
+            ----------
+            name : string
+                Name of the file that wants to be uploaded, without the format extension.
+            folder : string
+                Path of the file that want s to be uploaded. If None path is taken as home directory. Default is None.
+                
+            Returns
+            -------
+            spectra : 2-dim array
+                Uploaded pre-extracted spectra.
+            target_spectrum : 1-dim array
+                Mean/median of the pre-extracted spectra.
+            error_spectrum : 1-dim array
+                Standard deviation/median absolute deviation of the pre-extracted spectra.
+            """
+            if folder == None:
+                data = np.genfromtxt(name + '.txt' , dtype = int)
+            else:
+                data = np.genfromtxt(folder + name + '.txt' , dtype = int)
+    
+            x , y = data[0,:] , data[1,:]
+    
+            #a , b = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
+    
+            spectra = np.array([self.img[xi, yi, :] for xi, yi in zip(x, y)])[:,0,0,:]#np.asarray(self.img)[x , y , a:b]
+            print(spectra.shape)
+        
+            plt.imshow(self.RGB)
+            plt.plot(x,y, 'w*', linewidth=2)
+            plt.show()
+    
+            if mean == True:
+                target_spectrum = np.mean(spectra.T , axis = 1)
+                error_spectrum = np.std(spectra.T , axis = 1)
+            else:
+                target_spectrum = np.median(spectra.T , axis = 1)
+                error_spectrum = MAD(spectra.T , axis = 1)
+    
+            self.target , self.error_target , self.spectra = target_spectrum , error_spectrum , spectra
+    
+            return self.spectra.T , self.target , self.error_target
