@@ -77,7 +77,7 @@ class RGBImageManipulator():
         self.ch3 = ch3
         self.w = wavelength
 
-    def RGBVivianoBeck2014(self,  preset):
+    def RGB_Viviano_Beck_2014(self,  preset):
         """
         This function uploads descriptions, spectral parameter names and combinations for RGB map as given in Viviano-Beck et al., 2014 (https://doi.org/10.1002/2014JE004627).
         Used in the function RGB_map_slider.
