@@ -103,8 +103,10 @@ class SpectraNorm():
                 error_spectrum = MAD(spectra.T , axis = 1)
     
             self.target , self.error_target , self.spectra = target_spectrum , error_spectrum , spectra
-    
-            return self.spectra.T , self.target , self.error_target
+
+            I , J = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
+        
+            return self.spectra.T , self.target[I:J] , self.error_target[I:J]
         
     def upload_map(self , name , folder = None):
         """
