@@ -1329,3 +1329,371 @@ class SpectraAnalysis():
             plt.show()
             
             return GAUSS
+
+class MaficAnalysis():
+    """
+    Adpated from the paper from Horgan et al., 2014 ( https://doi.org/10.1016/j.icarus.2014.02.031 ).
+    This class is taylored for the analysis of mafic materials and mixes.
+
+    Parameters
+    ---------
+    data : numpy array
+        Data (i.e. mean spectrum) to be analyzed.
+    wav : numpy array
+        Wavelengths used as x-coordinate.
+    MIN : float
+        Minimum wavelength value
+    MAX : float
+        Maximum wavelength value
+    fs : float
+        Font size of text of axis and legends in the plots.
+    """
+    
+    def __init__(self, spectrum, wavelength, MIN, MAX, fsize = 15, pre_normed = True):
+        self.data = spectrum
+        self.wav = wavelength
+        self.MIN = MIN
+        self.MAX = MAX
+        self.fs = fsize
+        self.pre_normed = pre_normed
+    
+    def find_nearest(self, array, value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return idx
+
+    def plot(self):
+        plt.plot(self.wav , self.data , 'k')
+        plt.axvline(self.MIN , color = 'red' , linestyle = '--')
+        plt.axvline(self.MAX , color = 'blue' , linestyle = '--')
+        plt.xlabel('$\lambda$[nm]' , fontsize = self.fs)
+        plt.ylabel('Reflectance' , fontsize = self.fs)
+        plt.show()
+
+    def continuum_removal(self, interptype='linear', plot=False , smooth = False):
+        """
+        Applies continuum removal using convex hull or flat model for out-of-range spectra.
+        The hull will be constructed from the beginning to the maximum point of the spectrum. After that the hull will be a flat line.
+    
+        Parameters
+        ----------
+        interptype : string
+            Interpolation type for continuum modeling
+        plot : bool
+            Whether to plot the result. Default is False.
+        smooth : bool
+            Whether the input is the smoothed spectrum or not. Default is False.
+    
+        Returns
+        -------
+        removed_data : array
+            Continuum-removed reflectance.
+        """
+        if self.pre_normed == True:
+            self.removed_data = self.data
+            #return self.data
+        
+        I , J = self.find_nearest(self.wav , self.MIN) , self.find_nearest(self.wav , self.MAX)
+        
+        if smooth == True:
+            x , y = self.wav[I:J] , self.data
+        else:
+            x , y = self.wav[I:J] , self.data[I:J]
+
+        points = np.c_[x, y]
+        augmented = np.concatenate([points, [(x[0], np.min(y) - 1), (x[-1], np.min(y) - 1)]], axis=0)
+        hull = ConvexHull(augmented, incremental=True)
+        continuum_points = points[np.sort([v for v in hull.vertices if v < len(points)])]
+        continuum_function = interp1d(*continuum_points.T, kind=interptype)
+        continuum = continuum_function(x)
+    
+        if y[-1] < np.max(y):
+            max_idx = np.argmax(y)
+            x_max, y_max = x[max_idx], y[max_idx]
+        
+            # First part: from start to max
+            points1 = np.c_[x[:max_idx + 1], y[:max_idx + 1]]
+            augmented1 = np.concatenate([
+                points1,
+                [(x[0], np.min(y) - 1), (x[max_idx], np.min(y) - 1)]
+            ])
+        
+            hull = ConvexHull(augmented1, incremental=True)
+            left_points = points1[np.sort([v for v in hull.vertices if v < len(points1)])]
+        
+            # Second part: flat line from max to end
+            x_flat = x[max_idx:]
+            y_flat = np.full_like(x_flat, y_max)
+        
+            # Combine both
+            x_cont = np.concatenate((left_points[:, 0], x_flat))
+            y_cont = np.concatenate((left_points[:, 1], y_flat))
+        
+            continuum = interp1d(x_cont, y_cont, kind=interptype)(x)
+            
+        else:
+            points = np.c_[x, y]
+            augmented = np.concatenate([points, [(x[0], np.min(y) - 1), (x[-1], np.min(y) - 1)]], axis=0)
+            hull = ConvexHull(augmented, incremental=True)
+            continuum_points = points[np.sort([v for v in hull.vertices if v < len(points)])]
+            continuum_function = interp1d(*continuum_points.T, kind=interptype)
+            continuum = continuum_function(x)
+    
+        self.wav_cut = x
+        self.data_cut = y
+        self.continuum = continuum
+        self.removed_data = y / continuum
+    
+        if plot:
+            fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+            ax[0].plot(x, y, 'k', label='Original Spectrum')
+            ax[0].plot(x, continuum, 'r' , label='Continuum')
+            ax[1].plot(x, self.removed_data, 'b', label='Continuum-Removed')
+            for a in ax:
+                a.legend(fontsize = self.fs)
+                a.set_xlabel('Wavelength (nm)' , fontsize = self.fs)
+                a.set_ylabel('Reflectance' , fontsize = self.fs)
+            plt.tight_layout()
+            plt.show()
+    
+        return self.removed_data
+
+    def bands_removal(self , windows , mins , maxs , plot = False):
+        """
+        Bands removal technique involving a moving average over a given subset(s) of the spectrum.
+
+        Parameters
+        ----------
+        windows : list
+            List of the smoothing window to apply to the subset(s).
+        mins : list
+            List of the minimum values at which the smoothing process needs to be applied.
+        maxs : list
+            List of the maximum values at which the smoothing process needs to be applied.
+        plot : bool
+            Whether to plot the result. Default is False.
+
+        Returns
+        -------
+        spectrum : array
+            Cleaned spectrum. IMPORTANT, THIS OVERWRITES THE INPUT DATA.
+        """
+
+        for i in range(len(windows)):
+            win = windows[i]
+            I , J = self.find_nearest(self.wav , mins[i]) , self.find_nearest(self.wav , maxs[i])
+
+            for i in range(I,J+1):
+                start = max(0, i - win)
+                end = min(len(self.wav), i + win + 1)
+                self.data[i] = np.mean(self.data[start:end])
+    
+        if plot == True:
+            if self.pre_normed == True:
+                I , J = self.find_nearest(self.wav , self.MIN) , self.find_nearest(self.wav , self.MAX)
+                plt.plot(self.wav[I:J] , self.data , 'k')
+            else:
+                plt.plot(self.wav , self.data , 'k')
+            plt.ylabel('Reflectance', fontsize = self.fs)
+            plt.xlabel('$\lambda$[nm]', fontsize = self.fs)
+            plt.show()
+        return self.data
+    
+    def moving_average(self , window_size, plot = False, overwrite = False, removed = True):
+        """
+        Function to perform a moving average smoothing on the normalized spectrum.
+        
+        Parameters
+        ----------
+        window_size : int
+            Size of the step taken for the moving mean.
+        plot : bool
+            Whether to plot the result. Default is False.
+        overwrite : bool
+            Whether or not to overwrite the previsou self.data. Default is False.
+        removed : bool
+            Whether or not the data underwent continuum removal process or not. Default is True.
+        
+        Returns
+        -------
+        result : array
+            Moving-mean smoothed normalized spectrum.
+        """
+            
+        if window_size < 1:
+            raise ValueError("Window_size must be at least 1.")
+
+        I , J = self.find_nearest(self.wav , self.MIN) , self.find_nearest(self.wav , self.MAX)
+        x = self.wav[I:J]
+        if self.pre_normed == False:
+            if removed == True:
+                y = self.removed_data
+            else:
+                y = self.data[I:J]
+        else:
+            y = self.data
+        half_window = window_size // 2
+        result = np.zeros_like(y)
+
+        for i in range(len(y)):
+            start = max(0, i - half_window)
+            end = min(len(x), i + half_window + 1)
+            result[i] = np.mean(y[start:end])
+        self.final_smooth = result
+
+        if plot == True:
+            plt.plot(x , y , 'b')
+            plt.plot(x , self.final_smooth , 'r')
+            plt.xlabel('$\lambda$[nm]', fontsize = self.fs)
+            if removed == True or self.pre_normed == True:
+                plt.ylabel('Relative Reflectance', fontsize = self.fs)
+            else:
+                plt.ylabel('Reflectance', fontsize = self.fs)
+            plt.show()
+
+        if overwrite == True:
+            self.data = self.final_smooth
+        return self.final_smooth
+
+    def band_parameters(self, windows_nm = 75 , resolution_nm = 5 , plot = False , tol = 10 , smoothed_after_removed = False):
+        """
+        Core function of the class. Adapted from Horgan et al., 2014 (https://doi.org/10.1016/j.icarus.2014.02.031).
+        The band parameters are the band minimum, band center, band depth, band area and band asymmetry. For more infor refer to the paper.
+        The function can sometime not catch up and returns some error. Try with other parameters configuration in case. 
+        The issue refers to the way band centers are computed: due to the interpolation, sometimes that interpolation does not have a minium in the
+        give  region around the band minimum.
+
+        Parameters
+        ----------
+        windows_nm : float
+            Nanometric window around the band minimum where to search the band center.
+            
+        resolution_nm : float
+            Nanometric resolution of the 4-th order polynomial approximation used for the band center determination.
+
+        plot : bool
+            Whether to plot the result. Default is False.
+
+        tol : float
+            Minimum band wavelength span in nanometers. Bands with less wavelength span will not be analyzed.
+
+        Returns
+        -------
+        parameters : list
+            List of the parameters for each band.
+        """
+        I , J = self.find_nearest(self.wav , self.MIN) , self.find_nearest(self.wav , self.MAX)
+        x = self.wav[I:J]
+
+        if smoothed_after_removed == True:
+            y = self.final_smooth
+        else:
+            if self.pre_normed == True:
+                y = self.data
+            else:
+                y = self.removed_data
+
+        ones_indexes = np.argwhere(y == 1)#self.removed_data == 1)
+        ones_idx = []
+        for i in range(len(ones_indexes)):
+            ones_idx.append(ones_indexes[i][0])
+
+        print(ones_idx , ones_indexes)
+        
+        parameters = []
+
+        if plot == True:
+            fig , ax = plt.subplots( )
+        k = 0
+        for i in range(0, len(ones_idx) - 1):
+            
+            band_parameters = []
+
+            a = ones_idx[i+1]
+            if ones_idx[i] == a:
+                continue
+
+            if ones_idx[i+1] - ones_idx[i] >= tol:
+                k += 1
+            
+                S = y[ones_idx[i]:ones_idx[i+1]]
+                X = x[ones_idx[i]:ones_idx[i+1]]
+
+                band_parameters.append( (min(X) , max(X)) )
+    
+                # minimum computation
+                minimum , minimum_index = np.min(S) , np.argmin(S)
+                
+                band_parameters.append(X[minimum_index])
+    
+                # center computation
+                shift_right = self.find_nearest(X , X[minimum_index]+windows_nm)
+                shift_left = self.find_nearest(X , X[minimum_index]-windows_nm)
+                Xfit_range = np.arange(X[shift_left] , X[shift_right]+resolution_nm , resolution_nm)
+                
+                interp_S = interp1d(X, S, kind='cubic')(Xfit_range)
+                
+                coeffs = np.polyfit(Xfit_range, interp_S, 4)
+                poly = np.poly1d(coeffs)
+                y_poly = poly(Xfit_range)
+                
+                idx_center = np.argmin(y_poly)#[shift_left:shift_right])
+                band_center_wav = Xfit_range[idx_center]
+                band_center_val = y_poly[idx_center]
+                
+                band_parameters.append(band_center_wav)
+    
+                # depth computation
+                band_depth = 1 - S[idx_center]
+                
+                band_parameters.append(band_depth)
+
+                # area and asymmetry computation (open spectrum compatible)
+                if X[-1] >= x[-1] - resolution_nm:
+                    # Open band: skip area and asymmetry
+                    band_parameters.append(None)  # total_area
+                    band_parameters.append(None)  # asymmetry
+                else:
+                    total_area = np.trapz(np.ones_like(S) - S, X)
+                    band_parameters.append(total_area)
+                
+                    left_area = np.trapz(S[:idx_center], X[:idx_center])
+                    right_area = np.trapz(S[idx_center:], X[idx_center:])
+                    asymmetry = (right_area - left_area) / (100 * total_area)
+                    band_parameters.append(asymmetry)
+
+                band_parameters.append(asymmetry)
+
+                if plot == True:
+                    ax.axvline(band_center_wav+5 , color = 'blue' , linestyle = '--' , label = 'Band Center' , linewidth = 1)
+                    ax.axvline(X[minimum_index]+5 , color = 'red' , linestyle = '--' , label = 'Band Minimum' , linewidth = 1)
+                    ax.fill_between(X, np.ones(len(S)) , S , color = 'grey' , alpha = 0.5)
+                    ax.plot(Xfit_range , y_poly , color = 'black' , marker = 'o')
+
+                parameters.append(band_parameters)
+                print('Band number ' ,  k)
+                print('Band extremes = ' , band_parameters[0] , ' nm')
+                print('Band minimum = ' , np.round(band_parameters[1] , 2) , ' nm')
+                print('Band center = ' , np.round(band_parameters[2] , 2) , ' nm')
+                print('Band depth = ' , np.round(band_parameters[3] , 2))
+                print('Band area = ' , np.round(band_parameters[4] , 2) , ' nm')
+                print('Band asymmetry = ' , np.round(band_parameters[5] , 2) , ' %')
+                print('--------------------------------')
+
+        if plot == True:
+            ax.plot(x , y , 'k' , label = 'Continuum Removed Smoothed Spectrum')
+            ax.set_xlabel('$\lambda$[nm]' , fontsize = self.fs)
+            ax.set_ylabel('Relative Reflectance' , fontsize = self.fs)
+            plt.tick_params(axis='both', labelsize=self.fs)
+
+            minimum = plt.Line2D([], [], color='red', linestyle='--', linewidth = 1 , label = 'Band Minimum')
+            center = plt.Line2D([], [], color='blue', linestyle='--', linewidth = 1 , label = 'Band Center')
+            spectrum = plt.Line2D([], [], color='black', linestyle='-', linewidth = 1 , label = 'Target Spectrum')
+            interpolation = plt.Line2D([], [], color='black', marker = 'o', linestyle=None , markersize = 10 , label = '4-th Degree Polynomial')
+            
+            ax.legend(handles=[minimum , center , spectrum , interpolation][::-1] , fontsize = self.fs)
+            
+            #plt.legend(fontsize = self.fs)
+            plt.show()
+
+        return parameters
