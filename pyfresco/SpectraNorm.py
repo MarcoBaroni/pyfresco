@@ -59,7 +59,7 @@ class SpectraNorm():
         self.MIN = MIN
         self.MAX = MAX
 
-    def upload_spectrum_target(self , name , folder = None , mean = True):
+    def upload_spectrum(self , name , folder = None , mean = True):
             """
             Function to upload a set of pre-extracted spectra, saved using SpectraExtarct.save_spectra().
             
@@ -84,12 +84,12 @@ class SpectraNorm():
             else:
                 data = np.genfromtxt(folder + name + '.txt' , dtype = int)
     
-            x , y = data[0,:] , data[1,:]
+            x , y = data[:,0] , data[:,1]
     
-            #a , b = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
+            spectra = np.zeros( ( L , len(self.w) ) )
     
-            spectra = np.array([self.img[xi, yi, :] for xi, yi in zip(x, y)])[:,0,0,:]#np.asarray(self.img)[x , y , a:b]
-            print(spectra.shape)
+            for i in range(L):
+                spectra[i] = np.transpose( self.img[x[i] , y[i] , :] )[:,0,0]
         
             plt.imshow(self.RGB)
             plt.plot(x,y, 'w.')
@@ -102,11 +102,9 @@ class SpectraNorm():
                 target_spectrum = np.median(spectra.T , axis = 1)
                 error_spectrum = MAD(spectra.T , axis = 1)
     
-            self.target , self.error_target , self.spectra = target_spectrum , error_spectrum , spectra
-
-            I , J = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
-        
-            return self.spectra.T , self.target[I:J] , self.error_target[I:J]
+            self.m_spec , self.err_spec , self.spectra = target_spectrum , error_spectrum , spectra
+    
+            return self.spectra , self.m_spec , self.err_spec
         
     def upload_map(self , name , folder = None):
         """
