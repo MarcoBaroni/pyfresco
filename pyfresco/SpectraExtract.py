@@ -475,13 +475,13 @@ def upload_spectrum(self , name , folder = None , mean = True):
 
         x , y = data[:,0] , data[:,1]
 
-        spectra = np.zeros( ( L , self.Nbands ) )
+        spectra = np.zeros( ( len(x) , self.Nbands ) )
 
-        for i in range(L):
+        for i in range(len(x)):
             spectra[i] = np.transpose( self.img[x[i] , y[i] , :] )[:,0,0]
     
         plt.imshow(self.RGB)
-        plt.plot(x,y, 'w.')
+        plt.plot(y,x, 'w.')
         plt.show()
 
         if mean == True:
