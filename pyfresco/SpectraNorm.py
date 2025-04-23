@@ -86,13 +86,13 @@ class SpectraNorm():
     
             x , y = data[:,0] , data[:,1]
     
-            spectra = np.zeros( ( L , len(self.w) ) )
+            spectra = np.zeros( ( len(x) , len(self.w) ) )
     
-            for i in range(L):
+            for i in range(len(x)):
                 spectra[i] = np.transpose( self.img[x[i] , y[i] , :] )[:,0,0]
         
             plt.imshow(self.RGB)
-            plt.plot(x,y, 'w.')
+            plt.plot(y,x, 'w.')
             plt.show()
     
             if mean == True:
