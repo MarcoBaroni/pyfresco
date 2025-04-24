@@ -1,4 +1,4 @@
-__author__ = 'Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Maurizio Petrelli'
+__author__ = 'Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Massimiliano Porreca, Maurizio Petrelli'
 
 
 # pyFRESCO/__init__.py
