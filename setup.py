@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 setup(
     name="pyFRESCO",  
     version="0.1.0",  
-    description="A package for CRISM MTRDR datacubes RGB image generation, spectra exctraction and spectra analysis.",
-    author="Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Maurizio Petrelli",
+    description="A package for CRISM MTRDR datacubes RGB map generation, spectra exctraction, normalization and spectra analysis.",
+    author="Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Massimiliano Porreca, Maurizio Petrelli",
     author_email="mbaroni96@gmail.com",
     url="...", 
     packages=find_packages(exclude=["tests"]),  
