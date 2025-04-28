@@ -8,10 +8,6 @@ import sys
 # Add the project root directory to sys.path, so Python modules can be found
 sys.path.insert(0, os.path.abspath('..'))
 
-print("PYTHONPATH:", sys.path)
-import pyfresco
-print("pyfresco found:", pyfresco)
-
 # -- Project information -----------------------------------------------------
 
 project = 'FRESCO'
@@ -41,6 +37,8 @@ autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"]
 # Improve autodoc output
 autodoc_preserve_defaults = True
 autodoc_typehints = "description"
+
+master_doc = 'index'
 
 # Paths
 templates_path = ['_templates']
