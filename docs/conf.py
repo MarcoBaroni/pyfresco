@@ -32,7 +32,7 @@ extensions = [
 autosummary_generate = True
 
 # Mock heavy libraries (torch, rasterio, etc.)
-autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"]
+autodoc_mock_imports = ["torch", "rasterio", "spectral"]
 
 # Improve autodoc output
 autodoc_preserve_defaults = True
@@ -51,6 +51,6 @@ html_theme = "sphinx_rtd_theme"
 #intersphinx_mapping = {
 #    'python': ('https://docs.python.org/3', None),
 #}
-suppress_warnings = ["autodoc.import_object"]
+#suppress_warnings = ["autodoc.import_object"]
 
                     
