@@ -15,8 +15,6 @@ Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
    :maxdepth: 2
    :caption: Contents:
 
-modules
-
 .. figure:: _static/fresco.png
    :alt: Logo by https://www.ilariareed.it
    :width: 325px
@@ -28,6 +26,29 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+FRESCO Modules
+==================
+
+.. automodule:: pyfresco.RGBmap
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: pyfresco.SpectraExtract
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: pyfresco.SpectraNorm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: pyfresco.SpectraAnalysis
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Logo by https://www.ilariareed.it
 
