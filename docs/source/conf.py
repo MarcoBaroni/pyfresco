@@ -43,13 +43,10 @@ autodoc_preserve_defaults = True
 autodoc_typehints = "description"
 
 # Paths
-templates_path = ['_templates']
+templates_path = ['docs/source/_templates']
+html_static_path = ['docs/source/_static']
 exclude_patterns = []
-
-# -- Options for HTML output -------------------------------------------------
-
 html_theme = "sphinx_rtd_theme"
-html_static_path = ['_static']
 
 # -- Intersphinx Mapping -----------------------------------------------------
 # Example to link to Python Standard Library
