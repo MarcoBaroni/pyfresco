@@ -19,9 +19,8 @@ setup(
 	"rasterio>=1.3.10",
 	"scipy>=1.10.1",
 	"spectral>=0.23.1",
-	"torch>=2.4.0",
-	"torchvision>=0.19.0"
-    ],
+	"torch>=2.4.0"]
+	,
     extras_require={
         "dev": [
             "pytest>=6.0",
