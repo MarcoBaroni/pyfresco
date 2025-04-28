@@ -29,3 +29,5 @@ html_theme_options = {
 
 html_theme = 'sphinx_rtd_theme'#'alabaster'
 html_static_path = ['_static']
+
+autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"] # try w. this
