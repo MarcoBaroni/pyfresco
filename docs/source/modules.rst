@@ -6,7 +6,7 @@ FRESCO Modules
 RGBmap module
 -------------
 
-.. automodule:: pyfresco.RGBmap
+.. automodule:: .pyfresco.RGBmap
    :members:
    :undoc-members:
    :show-inheritance:
