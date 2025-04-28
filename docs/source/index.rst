@@ -10,6 +10,13 @@ FRESCO is a Free and Open Source Python module made to
 open, extract, preprocess and analyze spectral data gathered from the 
 Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 .. toctree::
    :maxdepth: 2
 
@@ -19,13 +26,6 @@ Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
    :alt: Logo by https://www.ilariareed.it
    :width: 325px
    :align: left
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 Logo by https://www.ilariareed.it
 
