@@ -8,6 +8,10 @@ import sys
 # Add the project root directory to sys.path, so Python modules can be found
 sys.path.insert(0, os.path.abspath('../..'))
 
+print("PYTHONPATH:", sys.path)
+import pyfresco
+print("pyfresco found:", pyfresco)
+
 # -- Project information -----------------------------------------------------
 
 project = 'FRESCO'
@@ -52,6 +56,6 @@ html_static_path = ['_static']
 #intersphinx_mapping = {
 #    'python': ('https://docs.python.org/3', None),
 #}
-
+suppress_warnings = ["autodoc.import_object"]
 
                     
