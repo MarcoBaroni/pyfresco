@@ -15,6 +15,25 @@ Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
    :width: 325px
    :align: left
 
+
+Features:
+=====================
+
+ - RGB maps: possibility to create RGB maps from spectral paramters datacube
+ - Spectra Extraction: three different means of spectra extraction from the CRISM datacube
+ - Spectra Normalization: various methods to normalize and pre process the target spectrum
+ - Spectra Analysis: Possibility to either make analogue comparisons and/or spectral deconvolution
+
+Installation:
+======================
+
+pyFRESCO can be installed using pip:
+
+pip install pyfresco
+
+Modules documentation:
+======================
+
 .. toctree::
    :maxdepth: 3
 
