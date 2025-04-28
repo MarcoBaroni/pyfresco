@@ -20,14 +20,6 @@ This Python package features 4 different modules:
    :width: 325px
    :align: left
 
-FRESCO is installable by pip:
-
-      pip install pyfresco
-
-or from github:
-
-      pip install git+https://github.com/MarcoBaroni/pyfresco.git
-
 .. toctree::
    :maxdepth: 3
 
