@@ -1,8 +1,6 @@
 FRESCO Modules
 ==============
 
-.. currentmodule:: pyfresco
-
 RGBmap module
 -------------
 
