@@ -12,6 +12,3 @@ python:
 sphinx:
   configuration: docs/conf.py
   builder: html
-
-build:
-  docs_dir: docs
