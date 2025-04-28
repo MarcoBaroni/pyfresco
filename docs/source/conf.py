@@ -6,7 +6,7 @@ import sys
 # -- Path setup --------------------------------------------------------------
 
 # Add the project root directory to sys.path, so Python modules can be found
-sys.path.insert(0, os.path.abspath('../../pyfresco'))
+sys.path.insert(0, os.path.abspath('../../pyfresco/'))
 
 # -- Project information -----------------------------------------------------
 
