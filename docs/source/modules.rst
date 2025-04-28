@@ -6,10 +6,8 @@ FRESCO Modules
 RGBmap module
 -------------
 
-.. automodule:: pyfresco.RGBmap
+.. automodule:: ../../pyfresco/RGBmap.py
    :members: 
-   pyfresco.RGBmap.open_raw
-   pyfresco.RGBmap.RGBImageManipulator
    :undoc-members:
    :show-inheritance:
 
