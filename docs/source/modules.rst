@@ -1,10 +1,3 @@
-FRESCO
-==========
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 FRESCO Modules
 ==================
 
