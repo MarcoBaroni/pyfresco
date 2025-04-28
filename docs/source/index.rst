@@ -12,7 +12,6 @@ Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    modules
 
