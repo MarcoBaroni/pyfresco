@@ -15,6 +15,11 @@ This Python package features 4 different modules:
  - Spectra Normalization: various methods to normalize and pre process the target spectrum
  - Spectra Analysis: Possibility to either make analogue comparisons and/or spectral deconvolution. Also an option for mafic analysis is present.
 
+.. figure:: _static/fresco.png
+   :alt: Logo by https://www.ilariareed.it
+   :width: 325px
+   :align: left
+
 FRESCO is installable by pip:
 
       pip install pyfresco
@@ -22,11 +27,6 @@ FRESCO is installable by pip:
 or from github:
 
       pip install git+https://github.com/MarcoBaroni/pyfresco.git
-
-.. figure:: _static/fresco.png
-   :alt: Logo by https://www.ilariareed.it
-   :width: 325px
-   :align: left
 
 .. toctree::
    :maxdepth: 3
