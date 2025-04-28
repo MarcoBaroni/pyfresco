@@ -15,11 +15,12 @@ Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
    :maxdepth: 2
    :caption: Contents:
 
+modules
+
 .. figure:: _static/fresco.png
    :alt: Logo by https://www.ilariareed.it
    :width: 325px
    :align: left
-
 
 Indices and tables
 ==================
