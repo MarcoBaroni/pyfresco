@@ -49,9 +49,9 @@ html_static_path = ['_static']
 
 # -- Intersphinx Mapping -----------------------------------------------------
 # Example to link to Python Standard Library
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-}
+#intersphinx_mapping = {
+#    'python': ('https://docs.python.org/3', None),
+#}
 
 
                     
