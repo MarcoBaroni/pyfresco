@@ -21,11 +21,12 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
-html_theme_options = {
-    "style_nav_header_background": "#007bff",  # Blue
-}
+#html_theme_options = {
+#    "style_nav_header_background": "#007bff",  # Blue
+#}
 html_static_path = ['_static']
 
+# momentaneous fix
 autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"]
 autodoc_preserve_defaults = True
 autodoc_typehints = "description"
