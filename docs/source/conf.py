@@ -28,6 +28,8 @@ html_theme_options = {
 }
 html_static_path = ['_static']
 
-#autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"]
+autodoc_mock_imports = ["torch", "torchvision", "rasterio", "spectral"]
+autodoc_preserve_defaults = True
+autodoc_typehints = "description"
 
                     
