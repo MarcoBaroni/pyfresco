@@ -21,7 +21,7 @@ This Python package features 4 different modules:
    :align: left
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    modules
 
