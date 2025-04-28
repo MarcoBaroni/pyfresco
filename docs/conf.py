@@ -29,16 +29,16 @@ extensions = [
 ]
 
 # Automatically generate summary tables
-autosummary_generate = True
+#autosummary_generate = True
 
 # Mock heavy libraries (torch, rasterio, etc.)
-autodoc_mock_imports = ["torch", "rasterio", "spectral"]
+#autodoc_mock_imports = ["torch", "rasterio", "spectral"]
 
 # Improve autodoc output
-autodoc_preserve_defaults = True
-autodoc_typehints = "description"
+#autodoc_preserve_defaults = True
+#autodoc_typehints = "description"
 
-master_doc = 'index'
+#master_doc = 'index'
 
 # Paths
 templates_path = ['_templates']
