@@ -1,3 +1,6 @@
+"""RGBmap module for FRESCO package.
+"""
+
 import matplotlib
 matplotlib.use('TkAgg')
 import numpy as np
