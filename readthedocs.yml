@@ -10,6 +10,6 @@ python:
     - requirements: docs/requires.txt
 
 sphinx:
-  configuration: docs/source/conf.py
+  configuration: docs/conf.py
   builder: html
   source: docs/source
