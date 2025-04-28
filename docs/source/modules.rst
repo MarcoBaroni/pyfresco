@@ -6,7 +6,7 @@ FRESCO Modules
 RGBmap module
 -------------
 
-.. automodule:: RGBmap.py
+.. automodule:: pyfresco.RGBmap
    :members: 
    :undoc-members:
    :show-inheritance:
@@ -14,7 +14,7 @@ RGBmap module
 SpectraExtract module
 ----------------------
 
-.. automodule:: SpectraExtract
+.. automodule:: pyfresco.SpectraExtract
    :members:
    :undoc-members:
    :show-inheritance:
@@ -22,7 +22,7 @@ SpectraExtract module
 SpectraNorm module
 -------------------
 
-.. automodule:: SpectraNorm
+.. automodule:: pyfresco.SpectraNorm
    :members:
    :undoc-members:
    :show-inheritance:
@@ -30,7 +30,7 @@ SpectraNorm module
 SpectraAnalysis module
 -----------------------
 
-.. automodule:: SpectraAnalysis
+.. automodule:: pyfresco.SpectraAnalysis
    :members:
    :undoc-members:
    :show-inheritance:
