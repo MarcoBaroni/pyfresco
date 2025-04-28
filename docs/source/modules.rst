@@ -7,7 +7,9 @@ RGBmap module
 -------------
 
 .. automodule:: RGBmap
-   :members:
+   :members: 
+   open_raw
+   RGBImageManipulator
    :undoc-members:
    :show-inheritance:
 
