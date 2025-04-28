@@ -23,7 +23,7 @@ This Python package features 4 different modules:
 .. toctree::
    :maxdepth: 3
 
-   modules
+   pyfresco
 
 Logo by https://www.ilariareed.it
 
