@@ -1,7 +1,7 @@
 # Include the root directory for autodoc to find the package
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../pyfresco'))
 
 project = 'FRESCO'
 copyright = '2025, Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Maurizio Petrelli, Massimiliano Porreca, Matteo Massironi'
