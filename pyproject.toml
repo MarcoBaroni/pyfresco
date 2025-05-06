@@ -7,8 +7,8 @@ name = "pyFRESCO"
 version = "0.1.0"
 license = { file = "LICENSE" }
 readme = "README.md"
+requires-python = ">=3.6"
 authors = [{ name = "Marco Baroni", email = "mbaroni96@gmail.com"}, {name = "Beatrice Baschetti", email = "beatrice.baschetti@inaf.it"}]
-
 
 dependencies = [
   "kneed>=0.8.5",
