@@ -8,7 +8,7 @@ setup(
     description="A package for CRISM MTRDR datacubes RGB map generation, spectra exctraction, normalization and spectra analysis.",
     author="Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Massimiliano Porreca, Maurizio Petrelli",
     author_email="mbaroni96@gmail.com",
-    url="...", 
+    url="https://github.com/MarcoBaroni/pyfresco/tree/main", 
     packages=find_packages(exclude=["tests"]),  
     include_package_data = True,
     install_requires=[
