@@ -452,7 +452,7 @@ class SpectraExtract():
                 np.savetxt(folder + name + '_' + method +'_median.txt' , self.m_spec)
                 np.savetxt(folder + name + '_' + method +'_mad.txt' , self.err_spec)
 
-def upload_spectrum(self , name , folder = None , mean = True):
+    def upload_spectrum(self , name , folder = None , mean = True):
         """
         Function to upload a set of pre-extracted spectra, saved using SpectraExtarct.save_spectra().
         
