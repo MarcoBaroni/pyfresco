@@ -233,6 +233,12 @@ class SpectraAnalysis():
         index : int
             Index of the given mineral name in the spectra_MICA_LAB_info.csv .
         """
+        MICA_spectra_names = ['Hematite' , 'Mg Olivine' , 'Fe Olivine' , 'Plagioclase' , 'Low Ca Pyroxene' , 'High Ca Pyroxene' , 
+                              'H20 Ice' , 'CO2 Ice' , 
+                              'Monohydrated Sulfate' , 'Alunite' , 'Hydroxylated Fe-Sulfate' , 'Jarosite' , 'Polyhydrated Sulfate' , 'Gypsum' , 'Bassanite' , 
+                              'Kaolinite' , 'Al Smectite' , 'Margarite' , 'Illite Muscovite' , 'Fe Smectite' , 'Mg Smectite' , 'Talc' , 'Serpentine' , 'Chlorite' , 
+                              'Mg Carbonate' , 'Ca Fe Carbonate' , 
+                              'Prehnite' , 'Hydrated Silica' , 'Epidote' , 'Analcime' , 'Chloride']
     
         if mineralname not in MICA_spectra_names:
             print('The name of the mineral must be in the list named MICA_spectra_names and the name must be present also in the spectra_MICA_LAB_info.csv file along with all other required inputs!')
