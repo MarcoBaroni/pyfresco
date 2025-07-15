@@ -536,7 +536,7 @@ class SpectraNorm():
         plt.tight_layout()
         plt.show()
 
-        self.neutral = np.array(img[:,:,:])[x , y , :]
+        self.neutral = np.array(self.img[:,:,:])[x , y , :]
 
         self.med = np.median(self.neutral , axis = 0)
         self.mad = MAD(self.neutral , axis = 0)
