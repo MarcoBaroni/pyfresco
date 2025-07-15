@@ -470,7 +470,7 @@ class SpectraNorm():
             for j in range(Y):
                 if all_maps[i,j] >= p:
                     superimposed[i,j] = 1
-                    spec.append(img[i,j,:])
+                    spec.append(self.img[i,j,:])
         
         ax[1].imshow(superimposed , 'Greys_r')
         plt.colorbar(im , ticks = np.arange(0,len(RGBs)+1 , dtype = int))
