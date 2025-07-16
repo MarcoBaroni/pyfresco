@@ -132,7 +132,7 @@ class SpectraAnalysis():
             The cut wavelength range.
         """
         
-        i , j = self.find_nearest(self.MIN , self.w) , self.find_nearest(self.MAX , self.w)
+        i, j = self.find_nearest(self.w, self.MIN), self.find_nearest(self.w, self.MAX)
 
         if folder == None:
             self.w = np.genfromtxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt')
