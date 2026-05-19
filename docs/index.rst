@@ -1,9 +1,9 @@
-.. FRESCO documentation master file, created by
+.. pyFRESCO documentation master file, created by
    sphinx-quickstart on Tue Mar 11 12:36:10 2025.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to FRESCO documentation!
+Welcome to pyFRESCO documentation!
 ====================
 
 .. figure:: _static/fresco.png
@@ -11,7 +11,7 @@ Welcome to FRESCO documentation!
    :width: 325px
    :align: center
 
-FRESCO is a Free and Open Source Python module made to 
+PyFRESCO is a Free and Open Source Python module made to 
 open, extract, preprocess and analyze spectral data gathered from the 
 Compact Reconnaissance Imaging Spectromoter for Mars (CRISM).
 This Python package features 4 different modules:
@@ -23,6 +23,7 @@ This Python package features 4 different modules:
 .. toctree::
    :maxdepth: 2
 
+   installation
    modules
 
 Logo by https://www.ilariareed.it
