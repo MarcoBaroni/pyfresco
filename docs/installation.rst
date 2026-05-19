@@ -15,17 +15,17 @@ To create a new environment in the anaconda prompt write and run, row by row:
   conda create -n pyfresco python=3.10
   conda activate pyfresco
 
-Now, there are two recommended ways to install *pyco2stats*: via the Python Package Index (PyPI) or directly from the source repository on GitHub.
+Now, there are two recommended ways to install *pyFRESCO*: via the Python Package Index (PyPI) or directly from the source repository on GitHub.
 
 Step 2.1: Installing from PyPi
 ------------------------------
-The easiest way to install the latest stable release of pyco2stats is the following. In the anaconda or command prompt write and run:
+The easiest way to install the latest stable release of pyfresco is the following. In the anaconda or command prompt write and run:
 
 .. code-block:: bash
 
   pip install pyfresco
 
-This will also install all required dependencies (NumPy, SciPy, pandas, matplotlib, plotly, etc.).
+This will also install all required dependencies (NumPy, SciPy, pandas, matplotlib, etc.).
 
 Step 2.2: Installing from source
 --------------------------------
