@@ -33,6 +33,16 @@ extensions = [
 
 # Mock heavy libraries (torch, rasterio, etc.)
 #autodoc_mock_imports = ["torch", "rasterio", "spectral"]
+autodoc_mock_imports = [
+    "torch",
+    "rasterio",
+    "spectral",
+    "numpy",
+    "pandas",
+    "scipy",
+    "matplotlib",
+    "kneed",
+]
 
 # Improve autodoc output
 #autodoc_preserve_defaults = True
