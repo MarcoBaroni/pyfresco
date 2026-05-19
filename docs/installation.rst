@@ -6,7 +6,7 @@ Step 1: Installing Anaconda
 ---------------------------
 First, install `Anaconda <https://www.anaconda.com/download/success>`_ for your OS.
 
-Step 2: Installing PyCO2stats
+Step 2: Installing pyFRESCO
 -----------------------------
 To create a new environment in the anaconda prompt write and run, row by row:
 
