@@ -20,6 +20,7 @@ release = '0.1.1'  # Full version (e.g., "0.1.1")
 # -- General configuration ---------------------------------------------------
 
 extensions = [
+    'nbsphinx',
     'sphinx.ext.autodoc',        # Auto-document docstrings
     'sphinx.ext.napoleon',       # Support for Google/NumPy-style docstrings
     'sphinx.ext.intersphinx',    # Link to other project's documentation
