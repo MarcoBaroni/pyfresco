@@ -46,6 +46,35 @@ Alternatively, clone the repository manually and install in editable mode. In th
 
 This setup allows you to track changes to the source code without reinstalling.
 
+Step 2.3: Where to run
+--------------------------------
+
+PyFRESCO is a PYthon tool that can work on any Python editor, but we recommend to run pyFRESCO on the Jupyter Notebook/Lab, since it was the editor in which it was tested more.
+
+To install Jupyter Notebook run:
+
+.. code-block:: bash
+
+  pip install notebook
+
+Then to open it run:
+
+.. code-block:: bash
+
+  jupyter notebook
+
+To install Jupyter Lab run:
+
+.. code-block:: bash
+
+  pip install jupyterlab
+
+Then to open it run:
+
+.. code-block:: bash
+
+  jupyter lab
+
 Troubleshooting
 ---------------
 
