@@ -1,4 +1,4 @@
-FRESCO Modules
+PyFRESCO Modules
 ==============
 
 .. automodule:: pyfresco.RGBmap
