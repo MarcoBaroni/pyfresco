@@ -24,6 +24,7 @@ This Python package features 4 different modules:
    :maxdepth: 2
 
    installation
+   notebooks
    modules
 
 Logo by https://www.ilariareed.it
