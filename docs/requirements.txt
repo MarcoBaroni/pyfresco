@@ -1,2 +1,6 @@
 sphinx
+sphinx_charts
 sphinx_rtd_theme
+nbsphinx
+nbconvert
+jupyter
