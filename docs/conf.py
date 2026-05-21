@@ -3,6 +3,8 @@
 import os
 import sys
 
+os.environ["MPLBACKEND"] = "Agg"
+
 # -- Path setup --------------------------------------------------------------
 
 # Add the project root directory to sys.path, so Python modules can be found
