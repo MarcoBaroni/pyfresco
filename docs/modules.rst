@@ -1,5 +1,5 @@
 PyFRESCO Modules
-==============
+================
 
 .. automodule:: pyfresco.RGBmap
    :members:
