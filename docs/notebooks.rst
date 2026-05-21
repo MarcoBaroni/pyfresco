@@ -7,4 +7,5 @@ Following we present some Jupyter Notebooks to show the capabilities of **pyFRES
    :maxdepth: 1
 
    notebooks/notebook1
-   notebooks/notebook2_extraction_method
+   notebooks/notebook2_extraction_methods
+   notebooks/notebook3_normalization_methods
