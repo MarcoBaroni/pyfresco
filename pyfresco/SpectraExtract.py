@@ -150,8 +150,8 @@ class SpectraExtract():
             Color of the polygon's corners. Default is 'white'.
         save_pixel : bool
             If to save or not the enclosed pixels coordinates in a .txt file. Default is False.
-        fodler : string
-            Folder in which to save the pixels if save_pixels is True. If None it saves in the home directory. Default is None.
+        folder : string
+            Folder in which to save the pixels if save_pixels is True. If None it saves in the home directory. Must end with the /. Default is None.
         name : string
             Name with which the pixels coorinates are saved. Default is 'spectra_coordinates'.
             
@@ -203,7 +203,7 @@ class SpectraExtract():
 
         return self.spectra , L , mask
     
-    def point_spectra(self, N):
+    def point_spectra(self, N, save_pixel=False, folder=None, name='spectra_coordinates'):
         """
         Function to select pixels from which to extract the spectra by selecting points on the RGB image. The spectra are then extracted from the enclosed pixels from the spectral reflectances datacube.
         
@@ -211,6 +211,13 @@ class SpectraExtract():
         ----------
         N : int
             Number of points that wants to be taken.
+        save_pixel : bool
+            If to save or not the enclosed pixels coordinates in a .txt file. Default is False.
+        folder : string
+            Folder in which to save the pixels if save_pixels is True. If None it saves in the home directory. Must end with the /. Default is None.
+        name : string
+            Name with which the pixels coorinates are saved. Default is 'spectra_coordinates'.
+            
             
         Returns
         -------
@@ -228,12 +235,19 @@ class SpectraExtract():
             y = coords[i][1]
             spectra[i] = self.img[int(x) , int(y) , :]
         self.spectra = spectra
+
+        if save_pixel == True:
+            if folder == None:
+                np.savetxt(name + '.txt' , np.array(coords , dtype = int))
+            else:
+                np.savetxt(folder + name + '.txt' , np.array(coords , dtype = int))
+        
         return self.spectra
 
-    def square_spectra(self, N, show = False):
+    def square_spectra(self, N, show = False, save_pixel=False, folder=None, name='spectra_coordinates'):
         """
         Function to select the area from which to extract the spectra by drawing a square on the RGB image. The spectra are then extracted from the enclosed pixels from the spectral reflectances datacube.
-        The square is drewn by selecting the center of the square and giving to it a side length.
+        The square is drewn by selecting the center of the square with the right mouse button and giving to it a side length.
         IMPORTANT: THE GIVEN SQUARE SIDE LENGTH MUST BE AN ODD NUMBER!
         
         Parameters
@@ -242,6 +256,12 @@ class SpectraExtract():
             Side length of the square (MUST BE AN ODD NUMBER!).
         show : bool
             Whether or not to show the location of the selected square. Default is False.
+        save_pixel : bool
+            If to save or not the enclosed pixels coordinates in a .txt file. Default is False.
+        folder : string
+            Folder in which to save the pixels if save_pixels is True. If None it saves in the home directory. Must end with the /. Default is None.
+        name : string
+            Name with which the pixels coorinates are saved. Default is 'spectra_coordinates'.
             
         Returns
         -------
@@ -295,6 +315,12 @@ class SpectraExtract():
         
         if show == True:
             plt.show()
+
+        if save_pixel == True:
+            if folder == None:
+                np.savetxt(name + '.txt' , np.array([X,Y] , dtype = int))
+            else:
+                np.savetxt(folder + name + '.txt' , np.array([X,Y] , dtype = int))
         
         return self.spectra , x , y
     
@@ -322,7 +348,7 @@ class SpectraExtract():
         plt.ylim(ylim_min , ylim_max)
         plt.xlim(self.MIN , self.MAX)
         plt.xlabel('$\lambda$ [nm]')
-        plt.ylabel('Relative reflectance')
+        plt.ylabel('Reflectance')
         plt.show()
         
     def final_spectra(self, mean = True, size = [5,15], c = 'blue'):
@@ -408,10 +434,10 @@ class SpectraExtract():
         '''
         i , j = self.find_nearest(self.MIN , self.w) , self.find_nearest(self.MAX , self.w)
         if folder == None:
-            np.savetxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt')
+            np.savetxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[j])+'.txt' , self.w[i:j])
             np.savetxt(name + '_' + method + '.txt' , self.spectra)
         else:
-            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt')
+            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt' , self.w[i:j])
             np.savetxt(folder + name + '_' + method + '.txt' , self.spectra)
     
     def save_spectrum(self , name , folder , method = 'polygon' , mean = True):
