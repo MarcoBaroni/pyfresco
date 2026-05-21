@@ -628,9 +628,9 @@ class SpectraNorm():
         constraints_ls = []
         for b,v in constraints:
             if b == 'R770':
-                constraints_ls.append((self.img_sr[:,:,get_band_index(img_sr,b)] > v).squeeze())
+                constraints_ls.append((self.img_sr[:,:,get_band_index(self.img_sr,b)] > v).squeeze())
             else:
-                constraints_ls.append((self.img_sr[:,:,get_band_index(img_sr,b)] < v).squeeze())
+                constraints_ls.append((self.img_sr[:,:,get_band_index(self.img_sr,b)] < v).squeeze())
 
         constraints_mask = np.array(constraints_ls).sum(axis=0) == len(constraints)
         print(f'{constraints_mask.size=}\n{constraints_mask.sum()=}')
@@ -689,7 +689,8 @@ class SpectraNorm():
         plt.fill_between(wav , self.target[a:b] - self.error_target[a:b] , self.target[a:b] + self.error_target[a:b] , color = 'b' , alpha = 0.2)
 
         plt.xlabel ('$\lambda$ [nm]')
-
+        plt.ylabel ('Reflectance')
+        
         plt.show()
 
     def norm_spectra(self , convex_hull = False):
@@ -792,6 +793,7 @@ class SpectraNorm():
             plt.fill_between(wav , self.norm-self.normerr , self.norm+self.normerr , color = 'black' , alpha = 0.5)
         
         plt.xlabel('$\lambda$[nm]')
+        plt.ylabel('Normalized Reflectance')
         plt.show()
         
     def save_spectrum(self , name , folder , method , normalized = True):
