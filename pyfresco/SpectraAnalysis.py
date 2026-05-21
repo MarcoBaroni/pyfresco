@@ -2,8 +2,8 @@
     SpectraAnalysis module
 """
 
-import matplotlib
-matplotlib.use('TkAgg')
+#import matplotlib
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
