@@ -21,10 +21,9 @@ This Python package features 4 different modules:
  - Spectra Analysis: possibility to either make analogue comparisons and/or spectral deconvolution. It is made up by 2 Python classes, one for direct spectral comparison with the spectra from the MICA files (Viviano-Beck et al., 2015) and for Machine Learning driven Modified Gaussian Models (Sunshine et al., 1990). The other class permits the analysis of mafic-related spectra with a pipeline adapted from Horgan et al., 2014.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    installation
-   notebooks
    modules
 
 Logo by https://www.ilariareed.it
