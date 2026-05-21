@@ -351,6 +351,7 @@ class SpectraAnalysis():
 
         plt.xlim(self.MIN , self.MAX)
         plt.xlabel('$\lambda$ [nm]' , fontsize = 15)
+        plt.ylabel('Relative Reflectance')
         plt.title(mineralname + '. Using ' + use + ' to compare.' , fontsize = 15)
         plt.show()
         
@@ -473,6 +474,7 @@ class SpectraAnalysis():
             # Set y axis limits for the MICA and laboratory plot and the labels
             axs[1].set_ylim( np.min(CRISM_spectra_y[CRISM_lim[0] : CRISM_lim[1]])-0.001 , np.max(CRISM_spectra_y[CRISM_lim[0] : CRISM_lim[1]]) + 0.001 )
             axs[2].set_ylim( np.min(LAB_spectra_y[LAB_lim[0] : LAB_lim[1]])-0.001 , np.max(LAB_spectra_y[LAB_lim[0] : LAB_lim[1]]) + 0.001 )
+            axs[0].set_ylabel('Relative Reflectance')
             axs[1].set_ylabel('Relative Reflectance')
             axs[2].set_ylabel('Reflectance')
 
@@ -862,8 +864,10 @@ class SpectraAnalysis():
             ax[0].plot(x , y , 'k')
             ax[0].plot(x , hull , 'b')
             ax[0].set_xlabel('$\lambda$ [nm]')
+            ax[0].set_ylabel('Reflectance')
             ax[1].set_xlabel('$\lambda$ [nm]')
             ax[1].plot(x , self.final , 'k')
+            ax[1].set_ylabel(Relative Reflectance)
             plt.show()
 
         return self.final        
@@ -1218,6 +1222,7 @@ class SpectraAnalysis():
         ax[0].yaxis.set_major_formatter(FuncFormatter(scientific_format))
 
         ax[1].set_xlabel('$\lambda$ [nm]')
+        ax[1].set_ylabel('Relative Reflectance')
 
         fig.subplots_adjust(hspace=0)
 
@@ -1255,6 +1260,7 @@ class SpectraAnalysis():
         for i in range(len(self.a)):            
             ax.plot(wav , ones - GAUSS[i] , 'b--' , linewidth = 1)
         ax.set_xlabel('$\lambda$ [nm]')
+        ax.set_ylabel('Relative Reflectance')
         plt.show()
         
         return GAUSS
