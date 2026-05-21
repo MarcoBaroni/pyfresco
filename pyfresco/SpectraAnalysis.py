@@ -867,7 +867,7 @@ class SpectraAnalysis():
             ax[0].set_ylabel('Reflectance')
             ax[1].set_xlabel('$\lambda$ [nm]')
             ax[1].plot(x , self.final , 'k')
-            ax[1].set_ylabel(Relative Reflectance)
+            ax[1].set_ylabel('Relative Reflectance')
             plt.show()
 
         return self.final        
