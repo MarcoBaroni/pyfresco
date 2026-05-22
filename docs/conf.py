@@ -17,7 +17,7 @@ copyright = '2025, Marco Baroni, Beatrice Baschetti, Alessandro Pisello, '
 copyright += 'Matteo Massironi, Massimiliano Porreca, Angelo Zinzi, Maurizio Petrelli'
 author = 'Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Massimiliano Porreca, Angelo Zinzi, Maurizio Petrelli'
 
-release = '0.1.1'  # Full version (e.g., "0.1.1")
+release = '0.1.5'  # Full version (e.g., "0.1.1")
 
 # -- General configuration ---------------------------------------------------
 
