@@ -12,10 +12,10 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'FRESCO'
+project = 'pyFRESCO'
 copyright = '2025, Marco Baroni, Beatrice Baschetti, Alessandro Pisello, '
-copyright += 'Maurizio Petrelli, Massimiliano Porreca, Matteo Massironi'
-author = 'Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Maurizio Petrelli, Massimiliano Porreca, Matteo Massironi'
+copyright += 'Matteo Massironi, Massimiliano Porreca, Angelo Zinzi, Maurizio Petrelli'
+author = 'Marco Baroni, Beatrice Baschetti, Alessandro Pisello, Matteo Massironi, Massimiliano Porreca, Angelo Zinzi, Maurizio Petrelli'
 
 release = '0.1.1'  # Full version (e.g., "0.1.1")
 
