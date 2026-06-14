@@ -23,9 +23,22 @@ from scipy.signal import savgol_filter, argrelextrema, find_peaks
 
 from kneed import KneeLocator
 
+import os
+
+try:
+    from importlib.resources import files as resource_files
+    from importlib.resources import as_file as resource_as_file
+except ImportError:
+    from importlib_resources import files as resource_files
+    from importlib_resources import as_file as resource_as_file
+
 import torch
 import torch.nn.functional as F
 from torch import nn
+
+from importlib.resources import files as resource_files
+from pathlib import Path as FilePath
+
 class SpectraAnalysis():
     """
     Class to perform the required spectral analyses. 
@@ -51,7 +64,7 @@ class SpectraAnalysis():
     folder : string
         Folder in which the data spectra_MICA_LAB_info.csv is stored. Default is pyFRESCO/data.
     """
-    def __init__(self , final , final_error , m_spec , err_spec , n_spectra , n_err , wavelength , MIN , MAX , folder = 'pyfresco/data'):
+    def __init__(self , final , final_error , m_spec , err_spec , n_spectra , n_err , wavelength , MIN , MAX , folder = None):
         
         self.final = final # normalized spectrum
         self.final_error = final_error # normalized spectrum propagated error
@@ -112,6 +125,55 @@ class SpectraAnalysis():
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
+
+    def _data_file(self, filename):
+    
+        filename = os.path.basename(str(filename))
+    
+        if self.folder is None:
+            return resource_files("pyfresco").joinpath("data", filename)
+    
+        return os.path.join(self.folder, filename)
+    
+    
+    def _read_data_table(self, filename):
+    
+        path = self._data_file(filename)
+    
+        if self.folder is None:
+            with resource_as_file(path) as p:
+                return pd.read_csv(p, encoding="utf-8-sig")
+    
+        return pd.read_csv(path, encoding="utf-8-sig")
+    
+    
+    def _read_reference_spectrum(self, filename, folder=None):
+    
+        filename = os.path.basename(str(filename))
+    
+        if folder is not None:
+            return np.genfromtxt(os.path.join(folder, filename))
+    
+        path = self._data_file(filename)
+    
+        if self.folder is None:
+            with resource_as_file(path) as p:
+                return np.genfromtxt(p)
+    
+        return np.genfromtxt(path)
+    
+    
+    def _read_mica_info(self):
+    
+        spectra_info = self._read_data_table("spectra_MICA_LAB_info.csv")
+    
+        spectra_info = spectra_info.rename(
+            columns={
+                "Notable Absoprtions LAB [nm]": "Notable Absorptions LAB [nm]"
+            }
+        )
+    
+        return spectra_info
     
     def upload_norm(self , name , folder):
         """
@@ -233,42 +295,25 @@ class SpectraAnalysis():
         index : int
             Index of the given mineral name in the spectra_MICA_LAB_info.csv .
         """
-        MICA_spectra_names = ['Hematite' , 'Mg Olivine' , 'Fe Olivine' , 'Plagioclase' , 'Low Ca Pyroxene' , 'High Ca Pyroxene' , 
-                              'H20 Ice' , 'CO2 Ice' , 
-                              'Monohydrated Sulfate' , 'Alunite' , 'Hydroxylated Fe-Sulfate' , 'Jarosite' , 'Polyhydrated Sulfate' , 'Gypsum' , 'Bassanite' , 
-                              'Kaolinite' , 'Al Smectite' , 'Margarite' , 'Illite Muscovite' , 'Fe Smectite' , 'Mg Smectite' , 'Talc' , 'Serpentine' , 'Chlorite' , 
-                              'Mg Carbonate' , 'Ca Fe Carbonate' , 
-                              'Prehnite' , 'Hydrated Silica' , 'Epidote' , 'Analcime' , 'Chloride']
+        spectra_info = self._read_mica_info()
+
+        MICA_spectra_names = list(spectra_info["Mineral Name"].dropna().values)
     
         if mineralname not in MICA_spectra_names:
-            print('The name of the mineral must be in the list named MICA_spectra_names and the name must be present also in the spectra_MICA_LAB_info.csv file along with all other required inputs!')
+            print("The name of the mineral must be in the MICA/LAB database.")
+            print("Available names are:")
+            print(MICA_spectra_names)
             return
     
-        # This is here just because at the moment I do not have any laboratory spectra of these minerals
         if mineralname == 'CO2 Ice' or mineralname == 'Hydroxylated Fe-Sulfate':
             use = 'MICA'
-
-        # Check if the use parameter is one of these
-        if use not in ['MICA' , 'LAB' , 'Both']:
-                raise ValueError("Parameter must be either 'MICA' , 'LAB' or 'Both'.")
-
-        # Upload the .csv files with all the indicized products
-        if self.folder == None:
-            spectra_info = pd.read_csv('spectra_MICA_LAB_info.csv' , sep = None ,
-                                       names = ["Mineral Name","Mineral Type","txt name CRISM","txt name LAB","CRISM spectra cube","Lab. Mineral",
-                                                "Type of Lab. From MICA","MICA Lab.Code","Type of Lab. From website",
-                                                "Notable Absorptions CRISM [nm]","Notable Absorptions LAB [nm]",
-                                                "Sample Grain Size [mum]"])
-        else:
-            spectra_info = pd.read_csv(self.folder + '/' + 'spectra_MICA_LAB_info.csv' , sep = None ,
-                                       names = ["Mineral Name","Mineral Type","txt name CRISM","txt name LAB","CRISM spectra cube","Lab. Mineral",
-                                                "Type of Lab. From MICA","MICA Lab.Code","Type of Lab. From website",
-                                                "Notable Absorptions CRISM [nm]","Notable Absorptions LAB [nm]",
-                                                "Sample Grain Size [mum]"])
-            
+    
+        if use not in ['MICA', 'LAB', 'Both']:
+            raise ValueError("Parameter must be either 'MICA', 'LAB' or 'Both'.")
+    
         self.index_db = spectra_info[spectra_info['Mineral Name'] == mineralname]
-        
-        # Constraint to one index
+        self.use = use
+    
         return self.index_db
         
     def simple_compare(self, mineralname, smooth = False, use = 'LAB', alpha = 0.15, folder = None, errorplot = False):
@@ -306,7 +351,7 @@ class SpectraAnalysis():
         # Upload MICA spectra
         if use == 'MICA' or use == 'Both':
 
-            CRISM_spectra = np.genfromtxt(I['txt name CRISM'].iloc[0])
+            CRISM_spectra = self._read_reference_spectrum(I['txt name CRISM'].iloc[0])
             CRISM_spectra_x = CRISM_spectra[:,0]*1000     
             CRISM_lim = self.limits(other_w = CRISM_spectra_x)
             abs_CRISM = eval(I['Notable Absorptions CRISM [nm]'].iloc[0])
@@ -314,7 +359,7 @@ class SpectraAnalysis():
         # Upload laboratory spectra
         if use == 'LAB' or use == 'Both':
 
-            LAB_spectra = np.genfromtxt(I['txt name LAB'].iloc[0])
+            LAB_spectra = self._read_reference_spectrum(I['txt name LAB'].iloc[0])
             LAB_spectra_x = LAB_spectra[:,0]*1000
             LAB_spectra_y = LAB_spectra[:,1]
 
@@ -407,9 +452,9 @@ class SpectraAnalysis():
         # Upload MICA spectra
         if use == 'MICA' or use == 'Both':
             if folder == None:
-                CRISM_spectra = np.genfromtxt(I['txt name CRISM'].iloc[0])
+                CRISM_spectra = self._read_reference_spectrum(I['txt name CRISM'].iloc[0])
             else:
-                CRISM_spectra = np.genfromtxt(folder + '/' + I['txt name CRISM'].iloc[0])
+                CRISM_spectra = self._read_reference_spectrum(folder + '/' + I['txt name CRISM'].iloc[0])
             CRISM_spectra_x = CRISM_spectra[:,0]*1000
             CRISM_spectra_y = CRISM_spectra[:,1]
             CRISM_lim = self.limits(other_w = CRISM_spectra_x)
@@ -418,7 +463,7 @@ class SpectraAnalysis():
         # Upload laboratory spectra
         if use == 'LAB' or use == 'Both':
             if folder == None:
-                LAB_spectra = np.genfromtxt(I['txt name LAB'].iloc[0])
+                LAB_spectra = self._read_reference_spectrum(I['txt name LAB'].iloc[0])
             else:
                 LAB_spectra = np.genfromtxt(folder + '/' + I['txt name LAB'].iloc[0])
             LAB_spectra_x = LAB_spectra[:,0]*1000
@@ -579,8 +624,8 @@ class SpectraAnalysis():
 
         I = self.index_db
 
-        LAB_spectra = np.genfromtxt(I['txt name LAB'].iloc[0])
-        CRISM_spectra = np.genfromtxt(I['txt name CRISM'].iloc[0])
+        LAB_spectra = self._read_reference_spectrum(I['txt name LAB'].iloc[0])
+        CRISM_spectra = self._read_reference_spectrum(I['txt name CRISM'].iloc[0])
 
         if I['Type of Lab. From website'].iloc[0] == 'USGS':
             LAB_spectra_x = LAB_spectra[:,0]/1000
@@ -698,15 +743,15 @@ class SpectraAnalysis():
         spectra_lim = self.limits()
         W2 = self.w[spectra_lim[0]:spectra_lim[1]]
 
-        spectra_info = pd.read_csv('spectra_MICA_LAB_info.csv' , sep = None ,
-                                   names = ["Mineral Name","Mineral Type","txt name CRISM","txt name LAB","CRISM spectra cube","Lab. Mineral",
-                                            "Type of Lab. From MICA","MICA Lab.Code","Type of Lab. From website",
-                                            "Notable Absorptions CRISM [nm]","Notable Absorptions LAB [nm]",
-                                            "Sample Grain Size [mum]"])
+        #spectra_info = pd.read_csv('spectra_MICA_LAB_info.csv' , sep = None ,
+        #                           names = ["Mineral Name","Mineral Type","txt name CRISM","txt name LAB","CRISM spectra cube","Lab. Mineral",
+        #                                    "Type of Lab. From MICA","MICA Lab.Code","Type of Lab. From website",
+        #                                    "Notable Absorptions CRISM [nm]","Notable Absorptions LAB [nm]",
+        #                                    "Sample Grain Size [mum]"])
 
         I = self.index_db
 
-        LAB_spectra = np.genfromtxt(I['txt name LAB'].iloc[0])
+        LAB_spectra = self._read_reference_spectrum(I['txt name LAB'].iloc[0])
 
         if I['Type of Lab. From website'].iloc[0] == 'USGS':
             LAB_spectra_x = LAB_spectra[:,0]/1e4
@@ -715,7 +760,7 @@ class SpectraAnalysis():
             LAB_spectra_x = LAB_spectra[:,0]*1000
             LAB_spectra_y = LAB_spectra[:,1]
 
-        CRISM_spectra = np.genfromtxt(I['txt name CRISM'].iloc[0])
+        CRISM_spectra = self._read_reference_spectrum(I['txt name CRISM'].iloc[0])
         CRISM_spectra_x = CRISM_spectra[:,0]*1000
         CRISM_spectra_y = CRISM_spectra[:,1]
 
