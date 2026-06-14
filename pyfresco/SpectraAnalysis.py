@@ -811,7 +811,7 @@ class SpectraAnalysis():
         CRISM_spectra_x = CRISM_spectra_x[spectra_lim[0]:spectra_lim[1]]
         CRISM_spectra_y = CRISM_spectra_y[spectra_lim[0]:spectra_lim[1]]
 
-        CRISM_abs = eval(spectra_info[spectra_info['Mineral Name']==mineralname]['Notable Absorptions CRISM [nm]'].iloc[0])
+        CRISM_abs = eval(I['Notable Absorptions CRISM [nm]'].iloc[0])
         ax1=ax[1].twinx()
         
         ax1.plot(W2 , norm+np.ones(len(norm))*p , color = 'blue' , linestyle = '-' , linewidth = 1 , label = '$\frac{Target}{Neutral}$')
@@ -844,7 +844,7 @@ class SpectraAnalysis():
         #############################################################################################################
         #############################################################################################################
 
-        LAB_abs = eval(spectra_info[spectra_info['Mineral Name']==mineralname]['Notable Absorptions LAB [nm]'].iloc[0])
+        LAB_abs = eval(I['Notable Absorptions LAB [nm]'].iloc[0])
 
         #ax2=ax[2].twinx()
         #ax2.plot(W2 , self.final , color = 'b' , linestyle = '-' , linewidth = 1)# , label = 'Target Spectrum')
