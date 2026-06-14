@@ -51,7 +51,7 @@ class SpectraExtract():
         self.MIN = MIN
         self.MAX = MAX
         
-    def upload_map(self , name , folder = None):
+    def upload_map(self , name , folder = None , map_type = 'rgb'):
         """
         Function to upload a pre-made RGB map, saved using RGBImageManipulator.save_map(), that wants to be used to extract the spectra.
         
@@ -61,6 +61,8 @@ class SpectraExtract():
             Name of the RGB map that wants to be uploaded.
         folder : string
             Path of the RGB map that want s to be uploaded. If None path is taken as home directory. Default is None.
+        map_type : string
+            Wether to use an RGB or BW map. Default is RGB. Accepted values are only RGB and BW.
             
         Returns
         -------
@@ -68,25 +70,26 @@ class SpectraExtract():
             Uploaded RGB map.
         """
 
-        if folder == None:
-            R = np.loadtxt(name + '_R.txt')
-            G = np.loadtxt(name + '_G.txt')
-            B = np.loadtxt(name + '_B.txt')
-        else:
-            R = np.loadtxt(folder + name + '_R.txt')
-            G = np.loadtxt(folder + name + '_G.txt')
-            B = np.loadtxt(folder + name + '_B.txt')    
+        if map_type == 'rgb':
+            if folder == None:
+                R = np.loadtxt(name + '_R.txt')
+                G = np.loadtxt(name + '_G.txt')
+                B = np.loadtxt(name + '_B.txt')
+            else:
+                R = np.loadtxt(folder + name + '_R.txt')
+                G = np.loadtxt(folder + name + '_G.txt')
+                B = np.loadtxt(folder + name + '_B.txt')    
+
+            self.RGB = np.dstack([R, G, B])
             
-        image = np.zeros((R.shape[0] , R.shape[1] , 3))
+        elif map_type == 'bw':
+            if folder == None:
+                BW = np.loadtxt(name + '.txt')
+            else:
+                BW = np.loadtxt(folder + name + '.txt')
 
-        for i in range(image.shape[0]):
-            for j in range(image.shape[1]):
-                image[i,j,0] = R[i,j]
-                image[i,j,1] = G[i,j]
-                image[i,j,2] = B[i,j]
-                
-        self.RGB = image
-
+            self.RGB = BW
+            
         return self.RGB
         
     def limits(self, other_w = None):
@@ -203,7 +206,7 @@ class SpectraExtract():
 
         return self.spectra , L , mask
     
-    def point_spectra(self, N, save_pixel=False, folder=None, name='spectra_coordinates'):
+    def point_spectra(self, N, save_pixel=False, folder=None, name='spectra_coordinates', cross_color='white', cross_size=120, cross_linewidth=1.5, cross_marker='+'):
         """
         Function to select pixels from which to extract the spectra by selecting points on the RGB image. The spectra are then extracted from the enclosed pixels from the spectral reflectances datacube.
         
@@ -217,24 +220,91 @@ class SpectraExtract():
             Folder in which to save the pixels if save_pixels is True. If None it saves in the home directory. Must end with the /. Default is None.
         name : string
             Name with which the pixels coorinates are saved. Default is 'spectra_coordinates'.
-            
+        cross_color : string
+            Color to mark the selected pixels. Default is white.
+        cross_size : float
+            Size of the marker. Default is 120.
+        cross_linewidth : float
+            Width of the marker. Default is 1.5.
+        cross_marker : string
+            Type of marker. Default is +.
             
         Returns
         -------
         spectra : 2-dim array
             Spectra extracted from the spectral reflectance datacube from the pixels corresponding to the points drewn on the RGB map.
         """
-        spectra = np.zeros((N , self.Nbands))
-    
-        plt.imshow(self.RGB)
-        coords = plt.ginput(n=N, timeout=0)
-        plt.show()
 
-        for i in range(N):
-            x = coords[i][0]
-            y = coords[i][1]
-            spectra[i] = self.img[int(x) , int(y) , :]
+        spectra = np.zeros((N, self.Nbands), dtype=float)
+    
+        fig, ax = plt.subplots()
+        ax.imshow(self.RGB)
+        ax.set_title(f"Select 0/{N} pixels")
+    
+        coords = []
+        artists = []
+    
+        def toolbar_active():
+            toolbar = getattr(fig.canvas, "toolbar", None)
+    
+            if toolbar is None:
+                return False
+    
+            mode = getattr(toolbar, "mode", "")
+    
+            if mode is None:
+                return False
+    
+            return str(mode) != ""
+    
+        def redraw_points():
+            for artist in artists:
+                artist.remove()
+    
+            artists.clear()
+    
+            for x, y in coords:
+                artist = ax.scatter(x, y, marker=cross_marker, s=cross_size, c=cross_color, linewidths=cross_linewidth)
+                artists.append(artist)
+    
+            fig.canvas.draw_idle()
+    
+        def onclick(event):
+            if event.inaxes != ax:
+                return
+    
+            if toolbar_active():
+                return
+    
+            if event.xdata is None or event.ydata is None:
+                return
+    
+            if len(coords) >= N:
+                return
+    
+            x = int(round(event.xdata))
+            y = int(round(event.ydata))
+    
+            coords.append((x, y))
+    
+            redraw_points()
+    
+            ax.set_title(f"Select {len(coords)}/{N} pixels")
+    
+            if len(coords) == N:
+                fig.canvas.mpl_disconnect(cid)
+                ax.set_title(f"Selected {N}/{N} pixels - close the window")
+                fig.canvas.draw_idle()
+    
+        cid = fig.canvas.mpl_connect("button_press_event", onclick)
+    
+        plt.show()
+    
+        for i, (x, y) in enumerate(coords):
+            spectra[i] = np.asarray(self.img[y, x, :]).squeeze()
+    
         self.spectra = spectra
+        self.point_coords = np.array(coords, dtype=int)
 
         if save_pixel == True:
             if folder == None:
@@ -324,28 +394,26 @@ class SpectraExtract():
         
         return self.spectra , x , y
     
-    def plot_spectra(self, N, ylim_min = 0, ylim_max = 0.5):
+    def plot_spectra(self , y_gap = 0.01):#, N, ylim_min = 0, ylim_max = 0.5):
         """
         Function to plot the spectra of the spectra arrays.
         
         Parameters
         ----------
         
-        N : int
-            Number of spectra
-        ylim_min : float
-            Minimum y value from which to plot
-        ylim_max : float
-            Maximum y value from which to plot
+        y_gap : float
+            Amount of y-axis border for the figure.
         
         Returns
         -------
         None
         """
 
-        for i in range(N):
+        I , J = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
+
+        for i in range(self.spectra.shape[0]):
             plt.plot(self.w , self.spectra[i])
-        plt.ylim(ylim_min , ylim_max)
+        plt.ylim(np.min(self.spectra[:,I:J])-y_gap , np.max(self.spectra[:,I:J])+y_gap)
         plt.xlim(self.MIN , self.MAX)
         plt.xlabel('$\lambda$ [nm]')
         plt.ylabel('Reflectance')
@@ -432,12 +500,12 @@ class SpectraExtract():
         -------
         None
         '''
-        i , j = self.find_nearest(self.MIN , self.w) , self.find_nearest(self.MAX , self.w)
+        i , j = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
         if folder == None:
             np.savetxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[j])+'.txt' , self.w[i:j])
             np.savetxt(name + '_' + method + '.txt' , self.spectra)
         else:
-            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt' , self.w[i:j])
+            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[j])+'.txt' , self.w[i:j])
             np.savetxt(folder + name + '_' + method + '.txt' , self.spectra)
     
     def save_spectrum(self , name , folder , method = 'polygon' , mean = True):
@@ -459,9 +527,9 @@ class SpectraExtract():
         -------
         None
         '''
-        i , j = self.find_nearest(self.MIN , self.w) , self.find_nearest(self.MAX , self.w)
+        i , j = self.find_nearest(self.w , self.MIN) , self.find_nearest(self.w , self.MAX)
         if folder == None:
-            np.savetxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt')
+            np.savetxt('Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[j])+'.txt' , self.w[i:j])
             if mean == True:
                 np.savetxt(name + '_' + method +'_mean.txt' , self.m_spec)
                 np.savetxt(name + '_' + method +'_std.txt' , self.err_spec)
@@ -470,7 +538,7 @@ class SpectraExtract():
                 np.savetxt(name + '_' + method +'_mad.txt' , self.err_spec)
                 
         else:
-            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[i:j])+'.txt')
+            np.savetxt(folder + 'Wavelength_from_'+str(self.w[i])+'_to_'+str(self.w[j])+'.txt' , self.w[i:j])
             if mean == True:
                 np.savetxt(folder + name + '_' + method +'_mean.txt' , self.m_spec)
                 np.savetxt(folder + name + '_' + method +'_std.txt' , self.err_spec)
