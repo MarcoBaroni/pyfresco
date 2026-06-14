@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyFRESCO"
-version = "0.1.1"
+version = "0.1.6"
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.6"
@@ -23,3 +23,16 @@ dependencies = [
 
 [project.urls]
 "Source" = "https://github.com/MarcoBaroni/pyfresco"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["pyfresco*"]
+
+[tool.setuptools.package-data]
+"pyfresco" = [
+  "data/*.txt",
+  "data/*.csv",
+  "data/*.xlsx"
+]
