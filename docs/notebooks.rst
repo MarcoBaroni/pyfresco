@@ -11,3 +11,4 @@ Following we present some Jupyter Notebooks to show the capabilities of **pyFRES
    notebooks/notebook3_normalization_methods
    notebooks/notebook4_mafic_analysis
    notebooks/notebook5_ml_mgm
+   notebooks/notebook6_maps
