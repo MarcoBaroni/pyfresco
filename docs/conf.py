@@ -31,6 +31,8 @@ extensions = [
     'sphinx.ext.autosummary',    # Generate function/class summary tables
 ]
 
+nbsphinx_execute = "never"
+
 # Automatically generate summary tables
 #autosummary_generate = True
 
