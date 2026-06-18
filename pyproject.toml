@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyFRESCO"
-version = "0.1.8"
+version = "0.1.9"
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.9,<3.12"
-authors = [{ name = "Marco Baroni", email = "mbaroni96@gmail.com"}, {name = "Beatrice Baschetti", email = "beatrice.baschetti@inaf.it"}]
+authors = [{ name = "Marco Baroni", email = "mbaroni96@gmail.com"}, {name = "Beatrice Baschetti", email = "beatrice.baschetti@inaf.it"},
+           { name = "Alessandro Pisello", email = "alessandropisello@gmail.com" }]
 
 dependencies = [
   "kneed>=0.8.5,<1",
